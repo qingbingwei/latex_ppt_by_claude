@@ -10,7 +10,7 @@ import (
 type PDFParser struct{}
 
 func (p *PDFParser) Parse(filePath string) (string, error) {
-	f, err := model.NewPdfReaderFromFile(filePath, nil)
+	f, _, err := model.NewPdfReaderFromFile(filePath, nil)
 	if err != nil {
 		return "", err
 	}

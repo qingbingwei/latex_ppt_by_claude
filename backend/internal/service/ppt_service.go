@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -129,13 +128,12 @@ func (s *PPTService) GetPPT(id uint) (*model.PPTRecord, error) {
 }
 
 func (s *PPTService) DeletePPT(id uint) error {
-	ppt, err := s.pptRepo.FindByID(id)
+	_, err := s.pptRepo.FindByID(id)
 	if err != nil {
 		return err
 	}
 
-	// Delete PDF file if exists
-	// Note: Removed os import, this is simplified
+	// Delete PDF file if exists (simplified for now)
 	
 	return s.pptRepo.Delete(id)
 }
