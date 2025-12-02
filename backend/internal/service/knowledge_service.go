@@ -14,10 +14,10 @@ import (
 )
 
 type KnowledgeService struct {
-	docRepo       *repository.DocumentRepository
+	docRepo         *repository.DocumentRepository
 	embeddingClient *embedding.OpenAIEmbedding
-	vectorDB      *vectordb.MilvusClient
-	uploadDir     string
+	vectorDB        *vectordb.MilvusClient
+	uploadDir       string
 }
 
 func NewKnowledgeService(
@@ -27,23 +27,27 @@ func NewKnowledgeService(
 	uploadDir string,
 ) *KnowledgeService {
 	return &KnowledgeService{
-		docRepo:       docRepo,
+		docRepo:         docRepo,
 		embeddingClient: embeddingClient,
-		vectorDB:      vectorDB,
-		uploadDir:     uploadDir,
+		vectorDB:        vectorDB,
+		uploadDir:       uploadDir,
 	}
 }
 
 func (s *KnowledgeService) ProcessDocument(ctx context.Context, doc *model.Document, filePath string) error {
+	log.Printf("Starting to process document: %s (ID: %d)", doc.Filename, doc.ID)
+
 	// Update status to processing
 	doc.Status = "processing"
 	if err := s.docRepo.Update(doc); err != nil {
+		log.Printf("Failed to update document status to processing: %v", err)
 		return err
 	}
 
 	// Parse document
 	p, err := parser.GetParser(doc.Filename)
 	if err != nil {
+		log.Printf("Failed to get parser for %s: %v", doc.Filename, err)
 		doc.Status = "failed"
 		s.docRepo.Update(doc)
 		return err
@@ -51,14 +55,19 @@ func (s *KnowledgeService) ProcessDocument(ctx context.Context, doc *model.Docum
 
 	content, err := p.Parse(filePath)
 	if err != nil {
+		log.Printf("Failed to parse document %s: %v", doc.Filename, err)
 		doc.Status = "failed"
 		s.docRepo.Update(doc)
 		return err
 	}
 
+	log.Printf("Parsed document %s, content length: %d chars", doc.Filename, len(content))
+
 	// Split into chunks
 	chunks := parser.SplitIntoChunks(content, 200, 50)
-	
+	log.Printf("Split document %s into %d chunks", doc.Filename, len(chunks))
+
+	successCount := 0
 	// Generate embeddings and store in vector DB
 	for i, chunkText := range chunks {
 		// Create chunk record
@@ -69,32 +78,35 @@ func (s *KnowledgeService) ProcessDocument(ctx context.Context, doc *model.Docum
 		}
 
 		if err := s.docRepo.CreateChunk(chunk); err != nil {
-			log.Printf("Failed to create chunk: %v", err)
+			log.Printf("Failed to create chunk %d: %v", i, err)
 			continue
 		}
 
-		// Generate embedding
-		emb, err := s.embeddingClient.GenerateEmbedding(ctx, chunkText)
+		// Generate embedding - 使用新的 context 避免请求结束后 context 被取消
+		emb, err := s.embeddingClient.GenerateEmbedding(context.Background(), chunkText)
 		if err != nil {
-			log.Printf("Failed to generate embedding: %v", err)
+			log.Printf("Failed to generate embedding for chunk %d: %v", i, err)
 			continue
 		}
+
+		log.Printf("Generated embedding for chunk %d, vector length: %d", i, len(emb))
 
 		// Store in Milvus
-		vectorID, err := s.vectorDB.Insert(ctx, int64(chunk.ID), int64(doc.ID), chunkText, emb)
+		vectorID, err := s.vectorDB.Insert(context.Background(), int64(chunk.ID), int64(doc.ID), chunkText, emb)
 		if err != nil {
-			log.Printf("Failed to insert into Milvus: %v", err)
+			log.Printf("Failed to insert chunk %d into Milvus: %v", i, err)
 			continue
 		}
 
 		// Update chunk with vector ID
 		chunk.VectorID = vectorID
-		s.docRepo.Update(&model.Document{}) // This should be chunk update, simplified for now
+		successCount++
 	}
 
 	// Update document status
 	doc.Status = "completed"
-	doc.ChunkCount = len(chunks)
+	doc.ChunkCount = successCount
+	log.Printf("Document %s processing completed, %d/%d chunks successful", doc.Filename, successCount, len(chunks))
 	return s.docRepo.Update(doc)
 }
 

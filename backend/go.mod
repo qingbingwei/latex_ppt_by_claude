@@ -9,7 +9,6 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/milvus-io/milvus-sdk-go/v2 v2.3.4
 	github.com/sashabaranov/go-openai v1.17.9
-	github.com/unidoc/unipdf/v3 v3.51.0
 	golang.org/x/crypto v0.23.0
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.12

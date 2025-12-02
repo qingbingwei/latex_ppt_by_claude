@@ -21,7 +21,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /app/server ./cmd/server
 # Runtime stage
 FROM alpine:latest
 
-# Install runtime dependencies including LaTeX
+# Install runtime dependencies including LaTeX and PDF tools
 RUN apk add --no-cache \
     texlive \
     texlive-xetex \
@@ -29,6 +29,7 @@ RUN apk add --no-cache \
     texmf-dist-fontsextra \
     texmf-dist-langchinese \
     font-noto-cjk \
+    poppler-utils \
     ca-certificates
 
 WORKDIR /app
