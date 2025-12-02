@@ -1,0 +1,45 @@
+# Environment files
+.env
+.env.local
+
+# Backend
+backend/uploads/
+backend/outputs/
+backend/server
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker
+*.pid
+
+# Temporary files
+tmp/
+temp/
+*.tmp
