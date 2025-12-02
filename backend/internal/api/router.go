@@ -26,7 +26,7 @@ func SetupRouter(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	router.Use(middleware.CORS())
 	router.Use(middleware.Logger())
 
-	// Initialize clients
+	// Initialize clients - 使用 copilot-api 代理时直接使用 OpenAI 客户端
 	var openaiClient *ai.OpenAIClient
 	if cfg.AI.OpenAIAPIKey != "" {
 		openaiClient = ai.NewOpenAIClient(cfg.AI.OpenAIAPIKey, cfg.AI.OpenAIBaseURL)
@@ -53,7 +53,7 @@ func SetupRouter(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 	// Initialize services
 	knowledgeService := service.NewKnowledgeService(docRepo, embeddingClient, milvusClient, cfg.Storage.UploadDir)
-	aiService := service.NewAIService(openaiClient, claudeClient)
+	aiService := service.NewAIService(openaiClient, claudeClient, nil)
 	pptService := service.NewPPTService(pptRepo, knowledgeService, aiService, latexCompiler, cfg.Storage.OutputDir)
 
 	// Initialize handlers

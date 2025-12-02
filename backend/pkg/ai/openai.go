@@ -2,29 +2,41 @@ package ai
 
 import (
 	"context"
+	"fmt"
+	"log"
 
 	"github.com/sashabaranov/go-openai"
 )
 
 type OpenAIClient struct {
-	client *openai.Client
+	client  *openai.Client
+	model   string
+	baseURL string
 }
 
 func NewOpenAIClient(apiKey, baseURL string) *OpenAIClient {
 	config := openai.DefaultConfig(apiKey)
+	// 使用 gpt-4o 模型（copilot-api 支持）
+	model := "claude-sonnet-4.5"
+
 	if baseURL != "" {
 		config.BaseURL = baseURL
 	}
+
 	return &OpenAIClient{
-		client: openai.NewClientWithConfig(config),
+		client:  openai.NewClientWithConfig(config),
+		model:   model,
+		baseURL: baseURL,
 	}
 }
 
 func (c *OpenAIClient) GenerateLaTeX(ctx context.Context, prompt string) (string, error) {
+	log.Printf("Generating LaTeX with model: %s, baseURL: %s", c.model, c.baseURL)
+
 	resp, err := c.client.CreateChatCompletion(
 		ctx,
 		openai.ChatCompletionRequest{
-			Model: openai.GPT4,
+			Model: c.model,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleSystem,
@@ -40,7 +52,12 @@ func (c *OpenAIClient) GenerateLaTeX(ctx context.Context, prompt string) (string
 	)
 
 	if err != nil {
-		return "", err
+		log.Printf("OpenAI API error: %v", err)
+		return "", fmt.Errorf("AI API error: %v", err)
+	}
+
+	if len(resp.Choices) == 0 {
+		return "", fmt.Errorf("no response from AI")
 	}
 
 	return resp.Choices[0].Message.Content, nil
@@ -50,7 +67,7 @@ func (c *OpenAIClient) StreamGenerateLaTeX(ctx context.Context, prompt string, s
 	stream, err := c.client.CreateChatCompletionStream(
 		ctx,
 		openai.ChatCompletionRequest{
-			Model: openai.GPT4,
+			Model: c.model,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleSystem,

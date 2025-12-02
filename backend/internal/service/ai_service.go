@@ -9,20 +9,27 @@ import (
 )
 
 type AIService struct {
-	openaiClient *ai.OpenAIClient
-	claudeClient *ai.ClaudeClient
+	openaiClient  *ai.OpenAIClient
+	claudeClient  *ai.ClaudeClient
+	copilotClient *ai.CopilotClient
 }
 
-func NewAIService(openaiClient *ai.OpenAIClient, claudeClient *ai.ClaudeClient) *AIService {
+func NewAIService(openaiClient *ai.OpenAIClient, claudeClient *ai.ClaudeClient, copilotClient *ai.CopilotClient) *AIService {
 	return &AIService{
-		openaiClient: openaiClient,
-		claudeClient: claudeClient,
+		openaiClient:  openaiClient,
+		claudeClient:  claudeClient,
+		copilotClient: copilotClient,
 	}
 }
 
 func (s *AIService) GenerateLaTeXPPT(ctx context.Context, prompt string, contextChunks []string, useOpenAI bool) (string, error) {
 	// Build enhanced prompt with RAG context
 	enhancedPrompt := s.buildPrompt(prompt, contextChunks)
+
+	// 优先使用 Copilot
+	if s.copilotClient != nil {
+		return s.copilotClient.GenerateLaTeX(ctx, enhancedPrompt)
+	}
 
 	if useOpenAI && s.openaiClient != nil {
 		return s.openaiClient.GenerateLaTeX(ctx, enhancedPrompt)
@@ -46,10 +53,10 @@ func (s *AIService) StreamGenerateLaTeXPPT(ctx context.Context, prompt string, c
 
 func (s *AIService) buildPrompt(userPrompt string, contextChunks []string) string {
 	var prompt strings.Builder
-	
+
 	prompt.WriteString("You are an expert in creating LaTeX Beamer presentations. ")
 	prompt.WriteString("Create a complete, compilable LaTeX Beamer presentation based on the following requirements.\n\n")
-	
+
 	if len(contextChunks) > 0 {
 		prompt.WriteString("=== Reference Materials (from knowledge base) ===\n")
 		for i, chunk := range contextChunks {
@@ -57,11 +64,11 @@ func (s *AIService) buildPrompt(userPrompt string, contextChunks []string) strin
 		}
 		prompt.WriteString("\n=== End of Reference Materials ===\n\n")
 	}
-	
+
 	prompt.WriteString("Requirements:\n")
 	prompt.WriteString(userPrompt)
 	prompt.WriteString("\n\n")
-	
+
 	prompt.WriteString("Guidelines:\n")
 	prompt.WriteString("1. Use \\documentclass[aspectratio=169,11pt]{beamer}\n")
 	prompt.WriteString("2. Include Chinese support with \\usepackage[UTF8]{ctex}\n")
@@ -72,10 +79,10 @@ func (s *AIService) buildPrompt(userPrompt string, contextChunks []string) strin
 	prompt.WriteString("7. Keep each frame concise (3-6 bullet points)\n")
 	prompt.WriteString("8. The output must be complete and compilable LaTeX code\n")
 	prompt.WriteString("9. Wrap the LaTeX code in ```latex code blocks\n")
-	
+
 	if len(contextChunks) > 0 {
 		prompt.WriteString("10. Incorporate relevant information from the reference materials provided\n")
 	}
-	
+
 	return prompt.String()
 }

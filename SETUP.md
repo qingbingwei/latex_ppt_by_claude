@@ -7,8 +7,9 @@
 ### Docker 部署（推荐）
 - Docker (版本 20.10 或更高)
 - Docker Compose (版本 2.0 或更高)
+- Node.js 18 或更高 (用于 copilot-api)
 - 至少 4GB 可用内存
-- OpenAI API Key 或 Claude API Key
+- GitHub Copilot 订阅（推荐）或 OpenAI/Claude API Key
 
 ### 本地开发
 - Go 1.21 或更高
@@ -25,15 +26,56 @@ git clone https://github.com/qingbingwei/latex_ppt_by_claude.git
 cd latex_ppt_by_claude
 ```
 
-### 2. 配置环境变量
+### 2. 配置 AI API (推荐使用 GitHub Copilot)
+
+#### 方式一：使用 copilot-api 代理 (推荐)
+
+```bash
+# 安装 copilot-api
+npm install -g copilot-api
+
+# 进行 GitHub 认证
+copilot-api auth
+# 按提示在浏览器中完成 GitHub 设备授权
+
+# 启动代理服务 (需要保持运行)
+copilot-api start --port 4141 &
+```
+
+配置 `.env`：
+```env
+OPENAI_API_KEY=dummy-key
+OPENAI_BASE_URL=http://host.docker.internal:4141/v1
+```
+
+> **为什么是 `host.docker.internal` 而不是 `localhost`？**
+> 
+> Docker 容器有独立的网络命名空间，容器内的 `localhost` 指向容器自己，而不是主机。
+> `host.docker.internal` 是 Docker 提供的特殊 DNS 名称，专门用于让容器访问主机上运行的服务。
+
+#### 方式二：使用 OpenAI 官方 API
+```env
+OPENAI_API_KEY=sk-your-openai-key-here
+OPENAI_BASE_URL=https://api.openai.com/v1
+```
+
+#### 方式三：使用 Claude API
+```env
+CLAUDE_API_KEY=your-claude-api-key-here
+```
+
+### 3. 配置环境变量
 ```bash
 cp .env.example .env
 ```
 
-编辑 `.env` 并添加您的 API 密钥：
+编辑 `.env` 文件（根据上面选择的 AI 配置方式）：
 ```env
-OPENAI_API_KEY=your-openai-api-key-here
-CLAUDE_API_KEY=your-claude-api-key-here
+# AI 配置 (选择上面的一种方式)
+OPENAI_API_KEY=dummy-key
+OPENAI_BASE_URL=http://host.docker.internal:4141/v1
+
+# JWT 密钥 (生产环境请更换)
 JWT_SECRET=your-secure-random-secret
 ```
 

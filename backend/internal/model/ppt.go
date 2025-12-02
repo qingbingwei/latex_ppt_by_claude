@@ -1,8 +1,6 @@
 package model
 
 import (
-	"database/sql/driver"
-	"encoding/json"
 	"time"
 )
 
@@ -24,29 +22,11 @@ func (PPTRecord) TableName() string {
 	return "ppt_records"
 }
 
-type IntArray []int
-
-func (a IntArray) Value() (driver.Value, error) {
-	return json.Marshal(a)
-}
-
-func (a *IntArray) Scan(value interface{}) error {
-	if value == nil {
-		*a = nil
-		return nil
-	}
-	bytes, ok := value.([]byte)
-	if !ok {
-		return nil
-	}
-	return json.Unmarshal(bytes, a)
-}
-
 type PPTKnowledgeRef struct {
 	ID         uint      `gorm:"primaryKey" json:"id"`
 	PPTID      uint      `gorm:"index;not null" json:"ppt_id"`
 	DocumentID uint      `gorm:"index" json:"document_id"`
-	ChunkIDs   IntArray  `gorm:"type:jsonb" json:"chunk_ids"`
+	ChunkIDs   string    `gorm:"type:text" json:"chunk_ids"` // JSON string of chunk IDs
 	CreatedAt  time.Time `json:"created_at"`
 }
 

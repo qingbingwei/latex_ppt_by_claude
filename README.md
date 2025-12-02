@@ -41,9 +41,37 @@
 
 - Docker 和 Docker Compose
 - 至少 4GB 可用内存
-- OpenAI API Key 或 Claude API Key
+- OpenAI API Key 或 GitHub Copilot 订阅
 
-### 一键启动
+### 一键部署
+
+```bash
+# 克隆项目
+git clone https://github.com/qingbingwei/latex_ppt_by_claude.git
+cd latex_ppt_by_claude
+
+# 运行一键部署脚本
+./scripts/deploy.sh
+```
+
+脚本会自动：
+- ✅ 检查系统依赖 (Docker, Docker Compose)
+- ✅ 配置 API Token (支持 GitHub Copilot / OpenAI)
+- ✅ 生成安全的 JWT 密钥
+- ✅ 构建 Docker 镜像
+- ✅ 启动所有服务
+- ✅ 等待服务就绪
+
+### 部署脚本参数
+
+```bash
+./scripts/deploy.sh              # 完整部署
+./scripts/deploy.sh --dev        # 开发模式 (只启动基础服务)
+./scripts/deploy.sh --clean      # 清理后重新部署
+./scripts/deploy.sh --skip-token # 跳过 Token 配置
+```
+
+### 手动部署
 
 1. 克隆项目:
 ```bash
@@ -206,13 +234,33 @@ make clean
 
 ```bash
 # AI API配置
-OPENAI_API_KEY=your-openai-api-key
-OPENAI_BASE_URL=https://api.openai.com/v1
+# 支持 OpenAI 兼容的 API，包括：
+# - GitHub Copilot: https://api.githubcopilot.com (推荐)
+# - OpenAI 官方: https://api.openai.com/v1
+OPENAI_API_KEY=your-github-copilot-token-or-openai-api-key
+OPENAI_BASE_URL=https://api.githubcopilot.com
 CLAUDE_API_KEY=your-claude-api-key
 
 # JWT配置
 JWT_SECRET=your-jwt-secret-key-change-this-in-production
 ```
+
+### 获取 GitHub Copilot Token
+
+如果使用 GitHub Copilot API，可以通过 GitHub CLI 获取 Token：
+
+```bash
+# 1. 安装 GitHub CLI
+brew install gh
+
+# 2. 登录 GitHub（首次使用需要授权）
+gh auth login
+
+# 3. 获取 Token
+gh auth token
+```
+
+将获取到的 Token（格式如 `gho_xxxx`）填入 `OPENAI_API_KEY` 即可。
 
 ## 故障排除
 

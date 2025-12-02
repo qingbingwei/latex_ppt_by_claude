@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive } from 'vue'
 import Header from '@/components/common/Header.vue'
 import { generatePPT, compileLaTeX, downloadPPT } from '@/api/ppt'
 import { usePPTStore } from '@/store/ppt'

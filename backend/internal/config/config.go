@@ -82,7 +82,7 @@ func Load() *Config {
 		},
 		AI: AIConfig{
 			OpenAIAPIKey:  getEnv("OPENAI_API_KEY", ""),
-			OpenAIBaseURL: getEnv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+			OpenAIBaseURL: getEnv("OPENAI_BASE_URL", "https://api.githubcopilot.com"),
 			ClaudeAPIKey:  getEnv("CLAUDE_API_KEY", ""),
 		},
 		JWT: JWTConfig{

@@ -58,7 +58,7 @@
 import { ref, onMounted } from 'vue'
 import Header from '@/components/common/Header.vue'
 import { getDocuments, uploadDocument, deleteDocument } from '@/api/knowledge'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
 import type { Document } from '@/types'
 
 const documents = ref<Document[]>([])
@@ -76,7 +76,7 @@ const loadDocuments = async () => {
 }
 
 const handleUpload = async (file: File) => {
-  const loading = ElMessage.loading('Uploading...')
+  const loadingInstance = ElLoading.service({ fullscreen: true, text: 'Uploading...' })
   try {
     await uploadDocument(file)
     ElMessage.success('Document uploaded successfully')
@@ -84,7 +84,7 @@ const handleUpload = async (file: File) => {
   } catch (error) {
     console.error('Upload error:', error)
   } finally {
-    loading.close()
+    loadingInstance.close()
   }
   return false
 }

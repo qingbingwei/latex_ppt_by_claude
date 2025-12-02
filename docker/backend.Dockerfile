@@ -5,12 +5,15 @@ WORKDIR /app
 # Install build dependencies
 RUN apk add --no-cache git
 
-# Copy go mod files
-COPY backend/go.mod backend/go.sum ./
-RUN go mod download
+# Copy go mod files and download dependencies
+COPY backend/go.mod ./
+RUN go mod download || true
 
 # Copy source code
 COPY backend/ ./
+
+# Tidy and download dependencies
+RUN go mod tidy && go mod download
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/server ./cmd/server
@@ -22,9 +25,10 @@ FROM alpine:latest
 RUN apk add --no-cache \
     texlive \
     texlive-xetex \
-    texlive-latex-extra \
     texmf-dist-latexextra \
     texmf-dist-fontsextra \
+    texmf-dist-langchinese \
+    font-noto-cjk \
     ca-certificates
 
 WORKDIR /app

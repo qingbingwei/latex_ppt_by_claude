@@ -1,4 +1,11 @@
-version: '3.8'
+# LaTeX PPT Generator Docker Compose 配置
+#
+# 使用方法:
+#   1. 启动 copilot-api: copilot-api start --port 4141
+#   2. 启动服务: docker-compose up -d
+#
+# 注意: 如果使用 copilot-api，需要先在主机上启动它
+# 容器通过 host.docker.internal 访问主机上的服务
 
 services:
   # PostgreSQL Database
@@ -66,12 +73,15 @@ services:
   milvus:
     image: milvusdb/milvus:v2.3.0
     container_name: latex_ppt_milvus
+    command: ["milvus", "run", "standalone"]
     depends_on:
       - etcd
       - minio
     environment:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
+      MINIO_ACCESS_KEY_ID: minioadmin
+      MINIO_SECRET_ACCESS_KEY: minioadmin
     volumes:
       - milvus_data:/var/lib/milvus
     ports:
@@ -86,6 +96,8 @@ services:
       retries: 3
 
   # Backend
+  # 注意: OPENAI_BASE_URL 使用 host.docker.internal 访问主机上的 copilot-api
+  # 因为容器内的 localhost 指向容器自己，不是主机
   backend:
     build:
       context: .
@@ -106,8 +118,9 @@ services:
       DB_NAME: latex_ppt
       MILVUS_HOST: milvus
       MILVUS_PORT: 19530
+      # AI API 配置 - 使用 copilot-api 代理时需要 host.docker.internal
       OPENAI_API_KEY: ${OPENAI_API_KEY}
-      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-http://host.docker.internal:4141/v1}
       CLAUDE_API_KEY: ${CLAUDE_API_KEY}
       JWT_SECRET: ${JWT_SECRET:-change-this-secret-in-production}
       JWT_EXPIRE_HOURS: 24

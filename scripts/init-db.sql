@@ -1,5 +1,5 @@
--- Create database
-CREATE DATABASE latex_ppt;
+-- Create database if not exists (handled by docker-compose POSTGRES_DB env var)
+-- The database latex_ppt is already created by PostgreSQL container
 
 -- Connect to the database
 \c latex_ppt;
