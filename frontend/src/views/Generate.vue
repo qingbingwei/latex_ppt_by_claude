@@ -85,7 +85,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import Header from '@/components/common/Header.vue'
-import { generatePPT, compileLaTeX, downloadPPT } from '@/api/ppt'
+import { generatePPT, compileLaTeX, downloadPPT, getPPTBlobUrl } from '@/api/ppt'
 import { usePPTStore } from '@/store/ppt'
 import { ElMessage } from 'element-plus'
 
@@ -118,7 +118,7 @@ const handleGenerate = async () => {
     latexContent.value = result.latex_content || ''
     
     if (result.pdf_path) {
-      pdfUrl.value = downloadPPT(result.id)
+      pdfUrl.value = await getPPTBlobUrl(result.id)
     }
     
     ElMessage.success('PPT generated successfully')
@@ -139,16 +139,21 @@ const handleCompile = async () => {
   try {
     const result = await compileLaTeX(latexContent.value)
     currentPPT.value = result
-    pdfUrl.value = downloadPPT(result.id)
+    pdfUrl.value = await getPPTBlobUrl(result.id)
     ElMessage.success('Compiled successfully')
   } catch (error) {
     console.error('Compilation error:', error)
   }
 }
 
-const handleDownload = () => {
+const handleDownload = async () => {
   if (currentPPT.value) {
-    window.open(downloadPPT(currentPPT.value.id), '_blank')
+    try {
+      await downloadPPT(currentPPT.value.id)
+    } catch (error) {
+      console.error('Download error:', error)
+      ElMessage.error('Download failed')
+    }
   }
 }
 </script>

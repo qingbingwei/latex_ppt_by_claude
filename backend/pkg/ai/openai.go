@@ -17,8 +17,8 @@ type OpenAIClient struct {
 func NewOpenAIClient(apiKey, baseURL string) *OpenAIClient {
 	config := openai.DefaultConfig(apiKey)
 	// 使用 gpt-4o 模型（copilot-api 支持）
-	model := "claude-sonnet-4.5"
-
+	// model := "claude-sonnet-4.5"
+	model := "gpt-4o"
 	if baseURL != "" {
 		config.BaseURL = baseURL
 	}

@@ -103,8 +103,13 @@ const handleView = (ppt: PPTRecord) => {
   dialogVisible.value = true
 }
 
-const handleDownload = (id: number) => {
-  window.open(downloadPPT(id), '_blank')
+const handleDownload = async (id: number) => {
+  try {
+    await downloadPPT(id)
+  } catch (error) {
+    console.error('Download error:', error)
+    ElMessage.error('Download failed')
+  }
 }
 
 const handleDelete = async (id: number) => {
