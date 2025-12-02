@@ -1,0 +1,2 @@
+# latex_ppt_by_claude
+基于claude生成latex制作ppt
