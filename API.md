@@ -1,24 +1,24 @@
-# API Documentation
+# API 文档
 
-Base URL: `http://localhost:8080/api/v1`
+基础 URL: `http://localhost:8080/api/v1`
 
-## Authentication
+## 认证
 
-Most endpoints require JWT authentication. Include the token in the Authorization header:
+大多数端点需要 JWT 认证。请在 Authorization 头中包含令牌：
 
 ```
 Authorization: Bearer <your_jwt_token>
 ```
 
-## Endpoints
+## 端点
 
-### Health Check
+### 健康检查
 
 #### GET /health
 
-Check if the API is running.
+检查 API 是否正在运行。
 
-**Response:**
+**响应:**
 ```json
 {
   "status": "ok",
@@ -28,13 +28,13 @@ Check if the API is running.
 
 ---
 
-## Authentication
+## 认证
 
 ### POST /auth/register
 
-Register a new user account.
+注册新用户账户。
 
-**Request Body:**
+**请求体:**
 ```json
 {
   "username": "john_doe",
@@ -43,7 +43,7 @@ Register a new user account.
 }
 ```
 
-**Response:**
+**响应:**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -57,18 +57,18 @@ Register a new user account.
 }
 ```
 
-**Status Codes:**
-- 201: Created successfully
-- 400: Invalid request data
-- 409: Username or email already exists
+**状态码:**
+- 201: 创建成功
+- 400: 请求数据无效
+- 409: 用户名或邮箱已存在
 
 ---
 
 ### POST /auth/login
 
-Login with existing credentials.
+使用现有凭据登录。
 
-**Request Body:**
+**请求体:**
 ```json
 {
   "username": "john_doe",
@@ -76,7 +76,7 @@ Login with existing credentials.
 }
 ```
 
-**Response:**
+**响应:**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -90,18 +90,18 @@ Login with existing credentials.
 }
 ```
 
-**Status Codes:**
-- 200: Login successful
-- 400: Invalid request data
-- 401: Invalid credentials
+**状态码:**
+- 200: 登录成功
+- 400: 请求数据无效
+- 401: 凭据无效
 
 ---
 
 ### GET /auth/profile
 
-Get current user profile. Requires authentication.
+获取当前用户个人资料。需要认证。
 
-**Response:**
+**响应:**
 ```json
 {
   "id": 1,
@@ -112,24 +112,24 @@ Get current user profile. Requires authentication.
 }
 ```
 
-**Status Codes:**
-- 200: Success
-- 401: Unauthorized
+**状态码:**
+- 200: 成功
+- 401: 未授权
 
 ---
 
-## Knowledge Base Management
+## 知识库管理
 
 ### POST /knowledge/upload
 
-Upload a document to the knowledge base. Requires authentication.
+上传文档到知识库。需要认证。
 
-**Request:**
+**请求:**
 - Content-Type: `multipart/form-data`
-- Field name: `file`
-- Supported formats: PDF, DOCX, TXT, MD
+- 字段名: `file`
+- 支持的格式: PDF, DOCX, TXT, MD
 
-**Response:**
+**响应:**
 ```json
 {
   "id": 1,
@@ -145,21 +145,21 @@ Upload a document to the knowledge base. Requires authentication.
 }
 ```
 
-**Status Codes:**
-- 201: Upload successful, processing started
-- 400: No file provided or invalid file type
-- 401: Unauthorized
-- 500: Upload failed
+**状态码:**
+- 201: 上传成功，开始处理
+- 400: 未提供文件或文件类型无效
+- 401: 未授权
+- 500: 上传失败
 
-**Note:** Document processing happens asynchronously. Poll the document status using GET /knowledge/:id
+**注意:** 文档处理是异步进行的。使用 GET /knowledge/:id 轮询文档状态
 
 ---
 
 ### GET /knowledge/list
 
-Get all documents for the current user. Requires authentication.
+获取当前用户的所有文档。需要认证。
 
-**Response:**
+**响应:**
 ```json
 [
   {
@@ -177,23 +177,23 @@ Get all documents for the current user. Requires authentication.
 ]
 ```
 
-**Status Codes:**
-- 200: Success
-- 401: Unauthorized
+**状态码:**
+- 200: 成功
+- 401: 未授权
 
-**Document Status Values:**
-- `pending`: Upload complete, waiting to be processed
-- `processing`: Currently being parsed and indexed
-- `completed`: Ready for use
-- `failed`: Processing failed
+**文档状态值:**
+- `pending`: 上传完成，等待处理
+- `processing`: 正在解析和索引
+- `completed`: 准备就绪
+- `failed`: 处理失败
 
 ---
 
 ### GET /knowledge/:id
 
-Get details of a specific document. Requires authentication.
+获取特定文档的详细信息。需要认证。
 
-**Response:**
+**响应:**
 ```json
 {
   "id": 1,
@@ -209,37 +209,37 @@ Get details of a specific document. Requires authentication.
 }
 ```
 
-**Status Codes:**
-- 200: Success
-- 401: Unauthorized
-- 404: Document not found
+**状态码:**
+- 200: 成功
+- 401: 未授权
+- 404: 文档未找到
 
 ---
 
 ### DELETE /knowledge/:id
 
-Delete a document from the knowledge base. Requires authentication.
+从知识库中删除文档。需要认证。
 
-**Response:**
+**响应:**
 ```json
 {
   "message": "Document deleted successfully"
 }
 ```
 
-**Status Codes:**
-- 200: Deleted successfully
-- 401: Unauthorized
-- 404: Document not found
-- 500: Deletion failed
+**状态码:**
+- 200: 删除成功
+- 401: 未授权
+- 404: 文档未找到
+- 500: 删除失败
 
 ---
 
 ### POST /knowledge/search
 
-Search for similar content in the knowledge base. Requires authentication.
+在知识库中搜索相似内容。需要认证。
 
-**Request Body:**
+**请求体:**
 ```json
 {
   "query": "machine learning algorithms",
@@ -247,7 +247,7 @@ Search for similar content in the knowledge base. Requires authentication.
 }
 ```
 
-**Response:**
+**响应:**
 ```json
 [
   {
@@ -259,21 +259,21 @@ Search for similar content in the knowledge base. Requires authentication.
 ]
 ```
 
-**Status Codes:**
-- 200: Success
-- 400: Invalid request
-- 401: Unauthorized
-- 500: Search failed
+**状态码:**
+- 200: 成功
+- 400: 请求无效
+- 401: 未授权
+- 500: 搜索失败
 
 ---
 
-## PPT Generation
+## PPT 生成
 
 ### POST /ppt/generate
 
-Generate a LaTeX PPT. Requires authentication.
+生成 LaTeX PPT。需要认证。
 
-**Request Body:**
+**请求体:**
 ```json
 {
   "title": "Introduction to AI",
@@ -284,14 +284,14 @@ Generate a LaTeX PPT. Requires authentication.
 }
 ```
 
-**Fields:**
-- `title` (required): PPT title
-- `prompt` (required): Detailed requirements
-- `template` (optional): Template name (default, madrid, modern). Default: "default"
-- `document_ids` (optional): Array of document IDs to use from knowledge base
-- `use_openai` (optional): Use OpenAI (true) or Claude (false). Default: true
+**字段:**
+- `title` (必填): PPT 标题
+- `prompt` (必填): 详细要求
+- `template` (可选): 模板名称 (default, madrid, modern)。默认: "default"
+- `document_ids` (可选): 知识库中要使用的文档 ID 数组
+- `use_openai` (可选): 使用 OpenAI (true) 或 Claude (false)。默认: true
 
-**Response:**
+**响应:**
 ```json
 {
   "id": 1,
@@ -307,48 +307,48 @@ Generate a LaTeX PPT. Requires authentication.
 }
 ```
 
-**Status Codes:**
-- 200: Generation successful
-- 400: Invalid request
-- 401: Unauthorized
-- 500: Generation or compilation failed
+**状态码:**
+- 200: 生成成功
+- 400: 请求无效
+- 401: 未授权
+- 500: 生成或编译失败
 
-**PPT Status Values:**
-- `pending`: Request received
-- `generating`: AI is generating LaTeX code
-- `completed`: LaTeX generated and compiled to PDF
-- `failed`: Generation or compilation failed
+**PPT 状态值:**
+- `pending`: 已收到请求
+- `generating`: AI 正在生成 LaTeX 代码
+- `completed`: LaTeX 已生成并编译为 PDF
+- `failed`: 生成或编译失败
 
 ---
 
 ### GET /ppt/templates
 
-Get list of available LaTeX Beamer templates.
+获取可用 LaTeX Beamer 模板列表。
 
-**Response:**
+**响应:**
 ```json
 {
   "templates": ["default", "madrid", "modern"]
 }
 ```
 
-**Status Codes:**
-- 200: Success
+**状态码:**
+- 200: 成功
 
 ---
 
 ### POST /ppt/compile
 
-Compile LaTeX code to PDF. Requires authentication.
+将 LaTeX 代码编译为 PDF。需要认证。
 
-**Request Body:**
+**请求体:**
 ```json
 {
   "latex_content": "\\documentclass[aspectratio=169,11pt]{beamer}..."
 }
 ```
 
-**Response:**
+**响应:**
 ```json
 {
   "id": 2,
@@ -364,19 +364,19 @@ Compile LaTeX code to PDF. Requires authentication.
 }
 ```
 
-**Status Codes:**
-- 200: Compilation successful
-- 400: Invalid LaTeX content
-- 401: Unauthorized
-- 500: Compilation failed
+**状态码:**
+- 200: 编译成功
+- 400: LaTeX 内容无效
+- 401: 未授权
+- 500: 编译失败
 
 ---
 
 ### GET /ppt/history
 
-Get PPT generation history for the current user. Requires authentication.
+获取当前用户的 PPT 生成历史。需要认证。
 
-**Response:**
+**响应:**
 ```json
 [
   {
@@ -394,17 +394,17 @@ Get PPT generation history for the current user. Requires authentication.
 ]
 ```
 
-**Status Codes:**
-- 200: Success
-- 401: Unauthorized
+**状态码:**
+- 200: 成功
+- 401: 未授权
 
 ---
 
 ### GET /ppt/:id
 
-Get details of a specific PPT record. Requires authentication.
+获取特定 PPT 记录的详细信息。需要认证。
 
-**Response:**
+**响应:**
 ```json
 {
   "id": 1,
@@ -420,48 +420,48 @@ Get details of a specific PPT record. Requires authentication.
 }
 ```
 
-**Status Codes:**
-- 200: Success
-- 401: Unauthorized
-- 404: PPT not found
+**状态码:**
+- 200: 成功
+- 401: 未授权
+- 404: PPT 未找到
 
 ---
 
 ### GET /ppt/:id/download
 
-Download the generated PDF. Requires authentication.
+下载生成的 PDF。需要认证。
 
-**Response:** Binary PDF file
+**响应:** 二进制 PDF 文件
 
-**Status Codes:**
-- 200: Success (returns PDF file)
-- 401: Unauthorized
-- 404: PPT or PDF not found
+**状态码:**
+- 200: 成功 (返回 PDF 文件)
+- 401: 未授权
+- 404: PPT 或 PDF 未找到
 
 ---
 
 ### DELETE /ppt/:id
 
-Delete a PPT record. Requires authentication.
+删除 PPT 记录。需要认证。
 
-**Response:**
+**响应:**
 ```json
 {
   "message": "PPT deleted successfully"
 }
 ```
 
-**Status Codes:**
-- 200: Deleted successfully
-- 401: Unauthorized
-- 404: PPT not found
-- 500: Deletion failed
+**状态码:**
+- 200: 删除成功
+- 401: 未授权
+- 404: PPT 未找到
+- 500: 删除失败
 
 ---
 
-## Error Response Format
+## 错误响应格式
 
-All error responses follow this format:
+所有错误响应遵循此格式：
 
 ```json
 {
@@ -469,37 +469,37 @@ All error responses follow this format:
 }
 ```
 
-## Rate Limiting
+## 速率限制
 
-Currently, no rate limiting is implemented. For production use, consider implementing rate limiting on:
-- Authentication endpoints (to prevent brute force)
-- PPT generation (to control API costs)
-- File uploads (to prevent abuse)
+目前未实施速率限制。对于生产使用，请考虑在以下方面实施速率限制：
+- 认证端点 (防止暴力破解)
+- PPT 生成 (控制 API 成本)
+- 文件上传 (防止滥用)
 
-## Example Usage with curl
+## curl 使用示例
 
-### Register a User
+### 注册用户
 ```bash
 curl -X POST http://localhost:8080/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"testuser","email":"test@example.com","password":"password123"}'
 ```
 
-### Login
+### 登录
 ```bash
 curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"testuser","password":"password123"}'
 ```
 
-### Upload Document
+### 上传文档
 ```bash
 curl -X POST http://localhost:8080/api/v1/knowledge/upload \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -F "file=@/path/to/document.pdf"
 ```
 
-### Generate PPT
+### 生成 PPT
 ```bash
 curl -X POST http://localhost:8080/api/v1/ppt/generate \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -512,17 +512,17 @@ curl -X POST http://localhost:8080/api/v1/ppt/generate \
   }'
 ```
 
-### Download PPT
+### 下载 PPT
 ```bash
 curl -X GET http://localhost:8080/api/v1/ppt/1/download \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -o presentation.pdf
 ```
 
-## Best Practices
+## 最佳实践
 
-1. **Token Management**: Store JWT tokens securely on the client side
-2. **Error Handling**: Always check status codes and handle errors appropriately
-3. **Large Files**: Use appropriate timeout values when uploading large documents
-4. **Polling**: When uploading documents, poll the status endpoint rather than waiting
-5. **Retry Logic**: Implement retry logic for transient failures (5xx errors)
+1. **令牌管理**: 在客户端安全地存储 JWT 令牌
+2. **错误处理**: 始终检查状态码并适当处理错误
+3. **大文件**: 上传大文件时使用适当的超时值
+4. **轮询**: 上传文档时，轮询状态端点而不是等待
+5. **重试逻辑**: 为瞬态故障 (5xx 错误) 实现重试逻辑
